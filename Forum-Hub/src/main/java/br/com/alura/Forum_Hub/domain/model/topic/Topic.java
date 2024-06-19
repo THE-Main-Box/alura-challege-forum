@@ -27,7 +27,7 @@ public class Topic {
     private LocalDateTime creationDateTime;
     private boolean responded;
     @ManyToOne
-    private User author;
+    private User user;
     private String course;
     private boolean deleted;
 
@@ -39,7 +39,7 @@ public class Topic {
         this.title = title;
         this.message = message;
         this.course = course;
-        this.author = user;
+        this.user = user;
         this.deleted = false;
         this.responded = false;
         this.creationDateTime = LocalDateTime.now();

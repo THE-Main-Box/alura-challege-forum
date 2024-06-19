@@ -23,10 +23,10 @@ public class Like {
     private Post post;
 
     @ManyToOne
-    private User personThatLiked;
+    private User user;
 
     public Like(Post post, User personThatLiked) {
         this.post = post;
-        this.personThatLiked = personThatLiked;
+        this.user = personThatLiked;
     }
 }

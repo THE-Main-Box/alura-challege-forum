@@ -53,7 +53,7 @@ public class Post {
         this.likes.add(like);
         this.likeIndex = likes.size();
 
-        if(like.getPersonThatLiked().getId().equals(topicOfPost.getAuthor().getId())){
+        if(like.getUser().getId().equals(topicOfPost.getUser().getId())){
             this.likedFromTopicAuthor = true;
         }
     }
@@ -61,7 +61,7 @@ public class Post {
     public void disLike(Like lk){
         likes.forEach(l -> likes.remove(lk));
         likeIndex= likes.size();
-        if (lk.getPersonThatLiked().getId().equals(topicOfPost.getAuthor().getId())) {
+        if (lk.getUser().getId().equals(topicOfPost.getUser().getId())) {
             this.likedFromTopicAuthor = false;
         }
     }
