@@ -39,11 +39,11 @@ public class Post {
     @ManyToOne(cascade = CascadeType.ALL)
     private Topic topicOfPost;
 
-    public Post(User user, String userResponse, Topic topicOfPost) {
+    public Post(User user, String userResponse, Topic topic) {
         this.user = user;
         this.userResponse = userResponse;
         this.creationDateTime = LocalDateTime.now();
-        this.topicOfPost = topicOfPost;
+        this.topicOfPost = topic;
         this.likeIndex = 0;
         this.deleted = false;
         this.likedFromTopicAuthor = false;

@@ -12,7 +12,7 @@ import java.util.Scanner;
 @Component
 class PublicURIReader {
 
-    private static final String FILE_PATH = "assets/public-uris.txt";
+    private static final String FILE_PATH = "assets/publicURIs.txt";
 
     public List<String> getPublicURIs() throws IOException {
         List<String> publicURIs = new ArrayList<>();

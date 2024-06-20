@@ -31,13 +31,13 @@ public class User implements UserDetails {
     private String login;
     private String password;
 
-    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user")
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> postList;
 
-    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user")
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Like> likeList;
 
-    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user")
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Topic> topicList;
 
     public User(String login, String password) {
@@ -59,4 +59,18 @@ public class User implements UserDetails {
     public String getUsername() {
         return this.login;
     }
+
+    public void addPost(Post p){
+        this.postList.add(p);
+    }
+
+    public void addTopic(Topic t){
+        this.topicList.add(t);
+    }
+
+    public void addLike(Like l){
+        this.likeList.add(l);
+    }
+
+
 }

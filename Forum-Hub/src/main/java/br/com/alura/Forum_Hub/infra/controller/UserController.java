@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +27,8 @@ import java.net.URI;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
+//    adicionar o relacionamento bidirecional dos likes posts e topicos
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -54,14 +57,20 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody @Valid AuthenticationDataDTO dataDTO) {
-        var token = new UsernamePasswordAuthenticationToken(dataDTO.login(), dataDTO.password());
-        Authentication authentication = manager.authenticate(token);
-        User user = (User) authentication.getPrincipal();
+    public ResponseEntity<TokenJWTDataDTO> login(@RequestBody @Valid AuthenticationDataDTO dataDTO) {
+        // Busca o usuário pelo login fornecido
+        User user = (User) userRepository.findByLogin(dataDTO.login());
 
-        String tokenToReturn = tokenService.generateToken(user);
+        // Verifica se o usuário existe e se a senha está correta
+        if (user == null || !passwordEncoder.matches(dataDTO.password(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        return ResponseEntity.ok().body(new TokenJWTDataDTO(tokenToReturn));
+        // Gera um token JWT válido para o usuário autenticado
+        String token = tokenService.generateToken(user);
+
+        // Retorna o token JWT na resposta
+        return ResponseEntity.ok().body(new TokenJWTDataDTO(token));
     }
 
     @GetMapping("/{id}")

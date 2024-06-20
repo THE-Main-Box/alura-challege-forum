@@ -23,30 +23,32 @@ public class SecurityFilter extends OncePerRequestFilter {
      * alem de fazer uma verificação do token e permitir a execução dependendo do resultado*/
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+        // Extrai o token JWT do cabeçalho Authorization
         String token = getTokenJWT(request);
+
         if (token != null) {
-            tokenService.validateToken(token);
-            var user = tokenService.getSecretOwner();
-
-            var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            try {
+                // Valida o token JWT
+                tokenService.validateToken(token);
+                // Não é necessário mais pegar o usuário aqui
+                // Apenas validamos o token neste filtro
+            } catch (RuntimeException e) {
+                // Manipula exceção se a validação do token falhar
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token inválido ou expirado");
+                return;
+            }
         }
 
         filterChain.doFilter(request, response);
-
     }
 
-
-    /*  valida se o token é nulo se for lança uma exceção caso contrário retira todos os espaços em branco e
-     *   retira a anotação bearer*/
+    /* Extrai o token JWT do cabeçalho Authorization */
     private String getTokenJWT(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader != null) {
-            return authorizationHeader.replace("Bearer ", "");
-        } else {
-            return null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7); // Remove "Bearer "
         }
+        return null;
     }
 }

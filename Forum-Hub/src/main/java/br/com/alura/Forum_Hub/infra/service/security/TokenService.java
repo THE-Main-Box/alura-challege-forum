@@ -10,12 +10,14 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 
+@Service
 public class TokenService {
     @Autowired
     private UserRepository userRepository;
@@ -45,8 +47,8 @@ public class TokenService {
             Instant expireAt = this.expire();
 
             return JWT.create()
-                    .withIssuer("API voll.med")
-                    .withSubject(user.getUsername())
+                    .withIssuer("Forum-Hub")
+                    .withSubject(user.getLogin())
                     .withClaim("id", user.getId())
                     .withExpiresAt(Date.from(expireAt))
                     .sign(algorithm);
@@ -58,17 +60,16 @@ public class TokenService {
     /*  utiliza a password disponibilizada pelo getSecret e o usa para setar o algoritimo
      *   para permitir a verificação do token passado*/
     public void validateToken(String token) {
-
         try {
             this.setSecret(token);
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("API voll.med")
+                    .withIssuer("Forum-Hub")
                     .build();
 
-            verifier.verify(token);
+            verifier.verify(token); // Verifica se o token é válido
         } catch (JWTVerificationException e) {
-            throw new RuntimeException("Erro ao validar o token: "+e);
+            throw new RuntimeException("Erro ao validar o token: " + e.getMessage());
         }
     }
 
