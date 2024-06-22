@@ -58,18 +58,13 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenJWTDataDTO> login(@RequestBody @Valid AuthenticationDataDTO dataDTO) {
-        // Busca o usuário pelo login fornecido
-        User user = (User) userRepository.findByLogin(dataDTO.login());
+        User user = (User) userRepository.findByLogin(dataDTO.login()); // Removido casting desnecessário
 
-        // Verifica se o usuário existe e se a senha está correta
         if (user == null || !passwordEncoder.matches(dataDTO.password(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // Gera um token JWT válido para o usuário autenticado
         String token = tokenService.generateToken(user);
-
-        // Retorna o token JWT na resposta
         return ResponseEntity.ok().body(new TokenJWTDataDTO(token));
     }
 

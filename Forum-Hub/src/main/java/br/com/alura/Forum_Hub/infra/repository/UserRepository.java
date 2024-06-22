@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Query("SELECT u FROM User u WHERE u.login = :login")
+    @Query("SELECT u FROM User u WHERE u.login = :login ")
     UserDetails findByLogin(String login);
 
     @Query("SELECT u FROM User u")

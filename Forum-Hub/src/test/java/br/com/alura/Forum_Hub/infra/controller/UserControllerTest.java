@@ -1,8 +1,11 @@
 package br.com.alura.Forum_Hub.infra.controller;
 
 import br.com.alura.Forum_Hub.domain.dto.user.AuthenticationDataDTO;
+import br.com.alura.Forum_Hub.domain.dto.user.TokenJWTDataDTO;
+import br.com.alura.Forum_Hub.domain.dto.user.UserDetailedDataDTO;
 import br.com.alura.Forum_Hub.domain.model.user.User;
 import br.com.alura.Forum_Hub.infra.repository.UserRepository;
+import br.com.alura.Forum_Hub.infra.service.security.TokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -14,11 +17,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,11 +46,15 @@ class UserControllerTest {
     @Autowired
     private UserRepository userRepository;
 
-    private final String USER_REGISTER_URL, USER_LOGIN_URL;
+    @Autowired
+    private TokenService tokenService;
+
+    private final String USER_REGISTER_URL, USER_LOGIN_URL, USER_LIST_URL;
 
     public UserControllerTest() {
         this.USER_REGISTER_URL = "/user/register";
         this.USER_LOGIN_URL = "/user/login";
+        this.USER_LIST_URL = "/user/list";
     }
 
     @Test
@@ -56,7 +68,17 @@ class UserControllerTest {
         String token = response.getContentAsString();
         System.out.println(token);
 
-        assertThat(token).isNotBlank();
+        String responseBody = response.getContentAsString();
+
+        assertThat(responseBody).isNotBlank();
+
+        // Verificar se o token retornado é um JWT válido
+        TokenJWTDataDTO tokenData = objectMapper.readValue(responseBody, TokenJWTDataDTO.class);
+        assertThat(tokenData.tokenJWT()).isNotBlank();
+
+        // Opcional: validar se o token é válido usando o serviço de token
+        tokenService.validateToken(tokenData.tokenJWT());
+
         assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
     }
 
@@ -73,19 +95,69 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("deveria retornar http:200 qunado o login é passado corretamente e é retornado um token")
+    @DisplayName("deveria retornar http:200 quando o login é passado corretamente e é retornado um token")
     public void loginUser_Scene1() throws Exception {
 
-        User savedUser = userRepository.save(new User("usuario", passwordEncoder.encode("123456")));
+        AuthenticationDataDTO userToSave = new AuthenticationDataDTO("usuario", "123456");
 
-        var response = mvc.perform(post(USER_LOGIN_URL)
+        // Registrar usuário
+        var registerResponse = mvc.perform(post(USER_REGISTER_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new AuthenticationDataDTO(savedUser.getLogin(),"123456"))))
+                        .content(objectMapper.writeValueAsString(userToSave)))
+                .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
-        System.out.println(response.getContentAsString());
-        assertThat(response.getContentAsString()).isNotBlank();
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        User savedUser = (User) userRepository.findByLogin(userToSave.login());
+
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getLogin()).isEqualTo(userToSave.login());
+
+        // Fazer login
+        var response = mvc.perform(post(USER_LOGIN_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userToSave)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        String responseBody = response.getContentAsString();
+        System.out.println(responseBody);
+
+        assertThat(responseBody).isNotBlank();
+
+        // Verificar se o token retornado é um JWT válido
+        TokenJWTDataDTO tokenData = objectMapper.readValue(responseBody, TokenJWTDataDTO.class);
+        assertThat(tokenData.tokenJWT()).isNotBlank();
+
+        // Opcional: validar se o token é válido usando o serviço de token
+        tokenService.validateToken(tokenData.tokenJWT());
     }
 
+
+
+    @Test
+    @DisplayName("Deveria devolver http:200 quando devolver corretamente a autorização")
+    @WithMockUser
+    public void listUser_Scene1() throws Exception {
+        AuthenticationDataDTO userToSave = new AuthenticationDataDTO("teste_2@email.com", "123456");
+
+        // Registrar usuário
+        var registerResponse = mvc.perform(post(USER_REGISTER_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userToSave)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
+
+        User savedUser = (User) userRepository.findByLogin(userToSave.login());
+
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getLogin()).isEqualTo(userToSave.login());
+
+        var listResponse = mvc.perform(get(USER_LIST_URL)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+
+
+    }
 }

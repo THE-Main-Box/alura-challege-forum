@@ -30,9 +30,12 @@ public class TokenService {
         try {
             DecodedJWT decodedJWT = JWT.decode(token);
             String login = decodedJWT.getSubject();
-            secretOwner = (User) userRepository.findByLogin(login);
-            this.secret = secretOwner.getPassword();
-
+            secretOwner = (User) userRepository.findByLogin(login); // Removido casting desnecessário
+            if (secretOwner != null) {
+                this.secret = secretOwner.getPassword();
+            } else {
+                throw new RuntimeException("Usuário não encontrado para o login: " + login);
+            }
         } catch (JWTDecodeException e) {
             throw new RuntimeException("Erro ao decodificar o token JWT: " + e.getMessage());
         }
