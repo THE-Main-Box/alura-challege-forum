@@ -132,8 +132,6 @@ class UserControllerTest {
         tokenService.validateToken(tokenData.tokenJWT());
     }
 
-
-
     @Test
     @DisplayName("Deveria devolver http:200 quando devolver corretamente a autorização")
     @WithMockUser
@@ -156,8 +154,6 @@ class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
-
-
-
     }
+
 }

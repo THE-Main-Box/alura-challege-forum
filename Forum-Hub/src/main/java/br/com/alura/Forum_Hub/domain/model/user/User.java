@@ -1,13 +1,11 @@
 package br.com.alura.Forum_Hub.domain.model.user;
 
+import br.com.alura.Forum_Hub.domain.model.like.Likables;
 import br.com.alura.Forum_Hub.domain.model.like.Like;
 import br.com.alura.Forum_Hub.domain.model.post.Post;
 import br.com.alura.Forum_Hub.domain.model.topic.Topic;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "usuarios")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -41,6 +40,10 @@ public class User implements UserDetails {
 
     @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Topic> topicList;
+
+    @Getter
+    @Enumerated(EnumType.ORDINAL)
+    private Likables ENTITY_TYPE = Likables.USER;
 
     public User(String login, String password) {
         this.login = login;

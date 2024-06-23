@@ -1,12 +1,10 @@
 package br.com.alura.Forum_Hub.domain.model.topic;
 
+import br.com.alura.Forum_Hub.domain.model.like.Likables;
 import br.com.alura.Forum_Hub.domain.model.post.Post;
 import br.com.alura.Forum_Hub.domain.model.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "topicos")
+@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,6 +33,10 @@ public class Topic {
     @OneToMany(/*fetch = FetchType.EAGER,*/ cascade =  CascadeType.ALL,
     mappedBy = "topicOfPost")
     List<Post> postList = new ArrayList<>();
+
+    @Getter
+    @Enumerated(EnumType.ORDINAL)
+    private Likables ENTITY_TYPE = Likables.TOPIC;
 
     public Topic(String title, String message, String course, User user) {
         this.title = title;

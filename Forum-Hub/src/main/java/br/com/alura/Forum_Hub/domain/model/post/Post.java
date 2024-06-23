@@ -1,13 +1,11 @@
 package br.com.alura.Forum_Hub.domain.model.post;
 
+import br.com.alura.Forum_Hub.domain.model.like.Likables;
 import br.com.alura.Forum_Hub.domain.model.like.Like;
 import br.com.alura.Forum_Hub.domain.model.topic.Topic;
 import br.com.alura.Forum_Hub.domain.model.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -38,6 +37,10 @@ public class Post {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Topic topicOfPost;
+
+    @Getter
+    @Enumerated(EnumType.ORDINAL)
+    private Likables ENTITY_TYPE = Likables.POST;
 
     public Post(User user, String userResponse, Topic topic) {
         this.user = user;
