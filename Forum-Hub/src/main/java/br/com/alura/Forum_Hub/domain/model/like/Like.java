@@ -17,14 +17,14 @@ public class Like {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.MERGE})
-    private Post post;
+    @Enumerated(EnumType.ORDINAL)
+    private Likables likedItem;
 
     @ManyToOne
     private User user;
 
-    public Like(Post post, User personThatLiked) {
-        this.post = post;
+    public Like(Likables likedItem, User personThatLiked) {
+        this.likedItem= likedItem;
         this.user = personThatLiked;
     }
 }

@@ -34,9 +34,8 @@ public class Topic {
     mappedBy = "topicOfPost")
     List<Post> postList = new ArrayList<>();
 
-    @Getter
     @Enumerated(EnumType.ORDINAL)
-    private Likables ENTITY_TYPE = Likables.TOPIC;
+    private Likables entityType = Likables.TOPIC;
 
     public Topic(String title, String message, String course, User user) {
         this.title = title;

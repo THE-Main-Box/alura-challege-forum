@@ -41,9 +41,8 @@ public class User implements UserDetails {
     @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Topic> topicList;
 
-    @Getter
     @Enumerated(EnumType.ORDINAL)
-    private Likables ENTITY_TYPE = Likables.USER;
+    private Likables entityType = Likables.USER;
 
     public User(String login, String password) {
         this.login = login;
