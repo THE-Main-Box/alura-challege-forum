@@ -14,6 +14,7 @@ public class ForumHubApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ForumHubApplication.class, args);
+		System.out.println("http://localhost:8080/swagger-ui.html");
 	}
 
 }

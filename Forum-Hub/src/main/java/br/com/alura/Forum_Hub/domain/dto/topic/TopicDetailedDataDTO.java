@@ -1,5 +1,7 @@
 package br.com.alura.Forum_Hub.domain.dto.topic;
 
+import br.com.alura.Forum_Hub.domain.dto.post.PostTopicDataDTO;
+import br.com.alura.Forum_Hub.domain.dto.user.UserDetailedDataDTO;
 import br.com.alura.Forum_Hub.domain.model.like.Likables;
 import br.com.alura.Forum_Hub.domain.model.post.Post;
 import br.com.alura.Forum_Hub.domain.model.topic.Topic;
@@ -12,10 +14,10 @@ public record TopicDetailedDataDTO(
         Long id,
         String title,
         LocalDateTime creationDateTime,
-        Long userID,
+        String userName,
         String course,
         Boolean deleted,
-        List<Long> post_id_list,
+        List<PostTopicDataDTO> post_id_list,
         Likables entityType
 ) {
     public TopicDetailedDataDTO(Topic t){
@@ -23,10 +25,10 @@ public record TopicDetailedDataDTO(
                 t.getId(),
                 t.getTitle(),
                 t.getCreationDateTime(),
-                t.getUser().getId(),
+                t.getUser().getUsername(),
                 t.getCourse(),
                 t.isDeleted(),
-                t.getPostList().stream().map(Post::getId).toList(),
+                t.getPostList().stream().map(PostTopicDataDTO::new).toList(),
                 t.getEntityType()
         );
     }

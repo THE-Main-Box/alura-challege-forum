@@ -1,5 +1,6 @@
 package br.com.alura.Forum_Hub.infra.config.security;
 
+import br.com.alura.Forum_Hub.domain.model.user.User;
 import br.com.alura.Forum_Hub.infra.service.security.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,10 +29,12 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if (token != null) {
             try {
-                // Valida o token JWT
                 tokenService.validateToken(token);
-                // Não é necessário mais pegar o usuário aqui
-                // Apenas validamos o token neste filtro
+
+                User user = tokenService.getSecretOwner();
+                var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (RuntimeException e) {
                 // Manipula exceção se a validação do token falhar
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

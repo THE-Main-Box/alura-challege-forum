@@ -21,10 +21,12 @@ public class Topic {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String title;
+    @Column(unique = true)
     private String message;
     private LocalDateTime creationDateTime;
-    private boolean responded;
+    private boolean answered;
     @ManyToOne
     private User user;
     private String course;
@@ -42,12 +44,12 @@ public class Topic {
         this.course = course;
         this.user = user;
         this.deleted = false;
-        this.responded = false;
+        this.answered = false;
         this.creationDateTime = LocalDateTime.now();
     }
 
     public void responseIsValid(){
-        this.responded = true;
+        this.answered = true;
     }
 
     public void deleteTopic(){

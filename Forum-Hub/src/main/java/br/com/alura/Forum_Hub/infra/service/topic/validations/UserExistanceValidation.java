@@ -4,6 +4,7 @@ import br.com.alura.Forum_Hub.domain.dto.topic.TopicRegisterDataDTO;
 import br.com.alura.Forum_Hub.domain.model.user.User;
 import br.com.alura.Forum_Hub.infra.exception.EntityIntegrityDataException;
 import br.com.alura.Forum_Hub.infra.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ public class UserExistanceValidation implements TopicCrationValidation {
         if (dataDTO.userLogin().isBlank()) {
             throw new EntityIntegrityDataException("para criar um tópico é nescessario passar um usuario");
         } else if(user.isEmpty()){
-            throw new EntityIntegrityDataException("para criar um tópico é nescessario um usuario existente");
+            throw new EntityNotFoundException("para criar um tópico é nescessario um usuario existente");
         }
     }
 }

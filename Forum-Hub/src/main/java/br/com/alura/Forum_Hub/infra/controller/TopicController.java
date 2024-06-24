@@ -1,13 +1,16 @@
 package br.com.alura.Forum_Hub.infra.controller;
 
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicDetailedDataDTO;
+import br.com.alura.Forum_Hub.domain.dto.topic.TopicListDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicRegisterDataDTO;
 import br.com.alura.Forum_Hub.domain.model.topic.Topic;
 import br.com.alura.Forum_Hub.infra.service.topic.TopicService;
-import br.com.alura.Forum_Hub.infra.service.user.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,9 +34,13 @@ public class TopicController {
         return ResponseEntity.created(uri).body(new TopicDetailedDataDTO(topic));
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<Page<TopicListDataDTO>> listTopics(@PageableDefault(size = 10, sort = "course") Pageable pageable){
+        return ResponseEntity.ok().body(topicService.listTopicsPaged(pageable));
+    }
+
     @GetMapping("/{id}")
-    @SecurityRequirement(name = "bearer-key")
-    public ResponseEntity<Object> showDetailedData(@PathVariable Long id){
+    public ResponseEntity<TopicDetailedDataDTO> showDetailedData(@PathVariable Long id){
         return ResponseEntity.ok(topicService.getTopicById(id));
     }
 }

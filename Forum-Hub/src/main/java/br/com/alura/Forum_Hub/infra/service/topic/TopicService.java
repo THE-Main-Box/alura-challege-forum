@@ -1,14 +1,21 @@
 package br.com.alura.Forum_Hub.infra.service.topic;
 
+import br.com.alura.Forum_Hub.domain.dto.topic.TopicDetailedDataDTO;
+import br.com.alura.Forum_Hub.domain.dto.topic.TopicListDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicRegisterDataDTO;
 import br.com.alura.Forum_Hub.domain.model.topic.Topic;
 import br.com.alura.Forum_Hub.infra.repository.TopicRepository;
 import br.com.alura.Forum_Hub.infra.service.topic.validations.TopicCrationValidation;
 import br.com.alura.Forum_Hub.infra.service.user.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+
 
 @Service
 public class TopicService {
@@ -21,12 +28,14 @@ public class TopicService {
     @Autowired
     private List<TopicCrationValidation> topicCreationValidation;
 
-    public Topic getTopicById(Long id) {
-        return topicRepository.getReferenceById(id);
+    public TopicDetailedDataDTO getTopicById(Long id) {
+        return new TopicDetailedDataDTO(topicRepository.getReferenceById(id));
     }
 
+    @Transactional
     public Topic createTopicObject(TopicRegisterDataDTO dataDTO) {
         this.topicCreationValidation.forEach(tcv -> tcv.validate(dataDTO));
+
         return topicRepository.save(
                 new Topic(
                         dataDTO.title(),
@@ -35,5 +44,9 @@ public class TopicService {
                         userService.getUserByLogin(dataDTO.userLogin())
                 )
         );
+    }
+
+    public Page<TopicListDataDTO> listTopicsPaged(Pageable pageable) {
+        return topicRepository.findAllPagedDeletedFalse(pageable).map(TopicListDataDTO::new);
     }
 }

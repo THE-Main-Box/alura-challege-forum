@@ -3,3 +3,4 @@
 /swagger-ui/**
 /user/register
 /user/login
+/topic/**
