@@ -30,8 +30,7 @@ public class Topic {
     private String course;
     private boolean deleted;
 
-    @OneToMany(/*fetch = FetchType.EAGER,*/ cascade =  CascadeType.ALL,
-    mappedBy = "topicOfPost")
+    @OneToMany(/*fetch = FetchType.EAGER,*/ cascade =  CascadeType.ALL, mappedBy = "topicOfPost")
     List<Post> postList = new ArrayList<>();
 
     @Enumerated(EnumType.ORDINAL)

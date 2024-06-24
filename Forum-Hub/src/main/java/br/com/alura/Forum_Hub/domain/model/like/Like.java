@@ -1,6 +1,5 @@
 package br.com.alura.Forum_Hub.domain.model.like;
 
-import br.com.alura.Forum_Hub.domain.model.post.Post;
 import br.com.alura.Forum_Hub.domain.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +18,9 @@ public class Like {
 
     @Enumerated(EnumType.ORDINAL)
     private Likables likedItem;
+
+    @Column(name = "item_curtido_id")
+    private Long likedItemId;
 
     @ManyToOne
     private User user;
