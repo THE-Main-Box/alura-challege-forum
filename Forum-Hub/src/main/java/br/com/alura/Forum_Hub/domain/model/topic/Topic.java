@@ -18,7 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Topic {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -32,7 +33,7 @@ public class Topic {
     private String course;
     private boolean deleted;
 
-    @OneToMany(/*fetch = FetchType.EAGER,*/ cascade =  CascadeType.ALL, mappedBy = "topicOfPost")
+    @OneToMany(/*fetch = FetchType.EAGER,*/ cascade = CascadeType.ALL, mappedBy = "topicOfPost")
     List<Post> postList = new ArrayList<>();
 
     @Enumerated(EnumType.ORDINAL)
@@ -48,11 +49,11 @@ public class Topic {
         this.creationDateTime = LocalDateTime.now();
     }
 
-    public void responseIsValid(){
+    public void responseIsValid() {
         this.answered = true;
     }
 
-    public void deleteTopic(){
-        this.deleted =true;
+    public void deleteTopic() {
+        this.deleted = true;
     }
 }

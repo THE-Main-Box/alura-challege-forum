@@ -25,8 +25,9 @@ public class Like {
     @ManyToOne
     private User user;
 
-    public Like(Likables likedItem, User personThatLiked) {
+    public Like(Likables likedItem, User personThatLiked, Long likedItemId) {
         this.likedItem= likedItem;
         this.user = personThatLiked;
+        this.likedItemId = likedItemId;
     }
 }

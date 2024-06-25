@@ -32,13 +32,13 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String password;
 
-    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.DETACH}, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Post> postList;
 
-    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.DETACH}, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Like> likeList;
 
-    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.DETACH}, mappedBy = "user", fetch = FetchType.LAZY)
     private List<Topic> topicList;
 
     @Enumerated(EnumType.ORDINAL)
@@ -77,4 +77,9 @@ public class User implements UserDetails {
     }
 
 
+    public void deleteTopic(Long topicId) {
+        this.topicList.remove(
+                this.topicList.stream().filter(tl -> tl.getId().equals(topicId)).findFirst().get()
+        );
+    }
 }

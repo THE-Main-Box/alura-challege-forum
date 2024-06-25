@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +19,6 @@ import java.io.IOException;
 public class SecurityFilter extends OncePerRequestFilter {
     @Autowired
     private TokenService tokenService;
-
 
     /*    verifica se o path da uri contém as uris correspondentes ào login e ao cadastro e libera a requisição
      * alem de fazer uma verificação do token e permitir a execução dependendo do resultado*/
