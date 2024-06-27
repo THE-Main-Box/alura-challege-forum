@@ -191,7 +191,7 @@ class TopicControllerTest {
 
         User user = userRepository.findUserByLogin(validDataDTO.userLogin()).get();
 
-        Topic topic = topicRepository.findById(user.getTopicList().getFirst().getId()).get();
+        Topic topic = topicRepository.findByUserLogin(user.getLogin()).get();
 
         LikeRegisterDataDTO validLikeData = new LikeRegisterDataDTO(
                 user.getLogin(),
@@ -221,8 +221,7 @@ class TopicControllerTest {
 
         user = userRepository.findUserByLogin(user.getLogin()).get();
 
-        System.out.println(userRepository.findById(user.getId()).get().getLikeList().size());
-        assertThat(user.getLikeList()).isEmpty();
+        assertThat(user.getLikeList().size()).isEqualTo(0);
 
     }
 

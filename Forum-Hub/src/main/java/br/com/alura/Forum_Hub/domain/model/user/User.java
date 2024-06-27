@@ -81,10 +81,4 @@ public class User implements UserDetails {
                 this.topicList.stream().filter(tl -> tl.getId().equals(topicId)).findFirst().get()
         );
     }
-
-    public void deleteLike(Long likeId) {
-        this.likeList.remove(
-                this.likeList.stream().filter(ll -> ll.getId().equals(likeId)).findFirst().get()
-        );
-    }
 }

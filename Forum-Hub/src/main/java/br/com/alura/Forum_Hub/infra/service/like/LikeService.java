@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,13 +36,19 @@ public class LikeService {
 
         TopicDetailedDataDTO topic = topicService.getTopicById(dataDTO.likedItemId());
 
-        if(like.isEmpty()){
+        if (like.isEmpty()) {
             throw new EntityIntegrityDataException("topico já foi discurtido");
         }
 
         var user = userRepository.findById(like.get().getUser().getId());
-        user.get().deleteLike(like.get().getId());
-        likeRepository.deleteById(like.get().getId());
-        userRepository.save(user.get());
+        List<Like> updatedLikeList = user.get().getLikeList();
+        Optional<Like> likeToDelete = updatedLikeList.stream().filter(ll -> ll.getId().equals(like.get().getId())).findFirst();
+        if (likeToDelete.isPresent()) {
+            updatedLikeList.remove(likeToDelete.get());
+            user.get().setLikeList(updatedLikeList);
+            likeRepository.deleteById(likeToDelete.get().getId());
+            userRepository.save(user.get());
+        }
+
     }
 }
