@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class TopicExistanceValidation implements ValidateTopicLikeing {
+public class LikeTopicExistanceValidation implements ValidateTopicLikeing {
 
     @Autowired
     private TopicRepository topicRepository;

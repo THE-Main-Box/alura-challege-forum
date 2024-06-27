@@ -16,7 +16,6 @@ public record TopicDetailedDataDTO(
         LocalDateTime creationDateTime,
         String userName,
         String course,
-        Boolean deleted,
         List<PostTopicDataDTO> post_id_list,
         Likables entityType
 ) {
@@ -27,7 +26,6 @@ public record TopicDetailedDataDTO(
                 t.getCreationDateTime(),
                 t.getUser().getUsername(),
                 t.getCourse(),
-                t.isDeleted(),
                 t.getPostList().stream().map(PostTopicDataDTO::new).toList(),
                 t.getEntityType()
         );

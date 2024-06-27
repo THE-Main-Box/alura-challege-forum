@@ -10,8 +10,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "usuarios")
@@ -33,16 +35,13 @@ public class User implements UserDetails {
     private String password;
 
     @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.DETACH}, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Post> postList;
+    private List<Post> postList = new ArrayList<>();
 
     @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.DETACH}, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Like> likeList;
+    private List<Like> likeList = new ArrayList<>();
 
     @OneToMany(cascade = {CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.DETACH}, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Topic> topicList;
-
-    @Enumerated(EnumType.ORDINAL)
-    private Likables entityType = Likables.USER;
+    private List<Topic> topicList = new ArrayList<>();
 
     public User(String login, String password) {
         this.login = login;
@@ -64,15 +63,15 @@ public class User implements UserDetails {
         return this.login;
     }
 
-    public void addPost(Post p){
+    public void addPost(Post p) {
         this.postList.add(p);
     }
 
-    public void addTopic(Topic t){
+    public void addTopic(Topic t) {
         this.topicList.add(t);
     }
 
-    public void addLike(Like l){
+    public void addLike(Like l) {
         this.likeList.add(l);
     }
 
@@ -80,6 +79,12 @@ public class User implements UserDetails {
     public void deleteTopic(Long topicId) {
         this.topicList.remove(
                 this.topicList.stream().filter(tl -> tl.getId().equals(topicId)).findFirst().get()
+        );
+    }
+
+    public void deleteLike(Long likeId) {
+        this.likeList.remove(
+                this.likeList.stream().filter(ll -> ll.getId().equals(likeId)).findFirst().get()
         );
     }
 }

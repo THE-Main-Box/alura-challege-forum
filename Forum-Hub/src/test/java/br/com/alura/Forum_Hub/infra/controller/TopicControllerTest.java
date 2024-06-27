@@ -4,12 +4,14 @@ import br.com.alura.Forum_Hub.domain.dto.like.LikeRegisterDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicRegisterDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicUpdateDataDTO;
 import br.com.alura.Forum_Hub.domain.model.like.Likables;
+import br.com.alura.Forum_Hub.domain.model.topic.Topic;
 import br.com.alura.Forum_Hub.domain.model.user.User;
 import br.com.alura.Forum_Hub.infra.repository.TopicRepository;
 import br.com.alura.Forum_Hub.infra.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +24,15 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest
 
 @AutoConfigureMockMvc
@@ -45,13 +51,14 @@ class TopicControllerTest {
     private TopicRepository topicRepository;
 
 
-    private final String TOPIC_REGISTER_URL, TOPIC_UPDATE_URL, TOPIC_DELETE_URL, TOPIC_LIKE_URL;
+    private final String TOPIC_REGISTER_URL, TOPIC_UPDATE_URL, TOPIC_DELETE_URL, TOPIC_LIKE_URL, TOPIC_DISLIKE_URL;
 
-    public TopicControllerTest(){
+    public TopicControllerTest() {
         this.TOPIC_REGISTER_URL = "/topic/register";
         this.TOPIC_UPDATE_URL = "/topic/update";
         this.TOPIC_DELETE_URL = "/topic/delete";
-        this.TOPIC_LIKE_URL = "/topic/like";
+        this.TOPIC_LIKE_URL = "/like/topic";
+        this.TOPIC_DISLIKE_URL = "/like/dislike/topic";
     }
 
     @Test
@@ -61,8 +68,8 @@ class TopicControllerTest {
         TopicRegisterDataDTO validDataDTO = this.setValidData();
 
         var response = mvc.perform(post(TOPIC_REGISTER_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(validDataDTO)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validDataDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
@@ -78,7 +85,7 @@ class TopicControllerTest {
         var response = mvc.perform(post(TOPIC_REGISTER_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validDataDTO)))
-                .andExpect(status().isNotFound() )
+                .andExpect(status().isNotFound())
                 .andReturn().getResponse();
 
         System.out.println(response.getContentAsString());
@@ -90,7 +97,8 @@ class TopicControllerTest {
     @WithMockUser
     public void updateTopic_Scene1() throws Exception {
         TopicRegisterDataDTO validDataDTO = this.setValidData();
-        TopicUpdateDataDTO validUpdateDataDTO = this.setUpdateValidData();
+
+        User user = userRepository.findUserByLogin(validDataDTO.userLogin()).get();
 
         var response = mvc.perform(post(TOPIC_REGISTER_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -99,6 +107,8 @@ class TopicControllerTest {
                 .andReturn().getResponse();
 
         System.out.println(response.getContentAsString());
+
+        TopicUpdateDataDTO validUpdateDataDTO = this.setUpdateValidData(user.getId());
 
         var updateResponse = mvc.perform(put(TOPIC_UPDATE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,6 +124,7 @@ class TopicControllerTest {
     @WithMockUser
     public void deleteTopic_Scene1() throws Exception {
         TopicRegisterDataDTO validDataDTO = this.setValidData();
+        User user = userRepository.findUserByLogin(validDataDTO.userLogin()).get();
 
         var response = mvc.perform(post(TOPIC_REGISTER_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -123,51 +134,101 @@ class TopicControllerTest {
 
         System.out.println(response.getContentAsString());
 
-        var updateResponse = mvc.perform(delete(TOPIC_DELETE_URL+"/1")
+        var updateResponse = mvc.perform(delete(TOPIC_DELETE_URL + "/" + user.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        System.out.println(topicRepository.findById(1L).get().isDeleted());
+        List<Topic> topicList = topicRepository.findAll();
+
+        assertThat(topicList).isEmpty();
     }
 
-//    @Test
-//    @DisplayName("deveria retornar http:200 quando curtido corretamente")
-//    @WithMockUser
-//    public void likeTopic_Scene1() throws Exception {
-//        TopicRegisterDataDTO validDataDTO = this.setValidData();
-//        LikeRegisterDataDTO validLikeDataDTO = this.setValidLikeData();
-//
-//        var response = mvc.perform(post(TOPIC_REGISTER_URL)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(validDataDTO)))
-//                .andExpect(status().isCreated())
-//                .andReturn().getResponse();
-//
-//        System.out.println(response.getContentAsString());
-//
-//        var updateResponse = mvc.perform(put(TOPIC_LIKE_URL)
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(validLikeDataDTO)))
-//                .andExpect(status().isOk())
-//                .andReturn().getResponse();
-//
-//        System.out.println(updateResponse.getContentAsString());
-//    }
-//
-//    private LikeRegisterDataDTO setValidLikeData() {
-//        return new LikeRegisterDataDTO(
-//                "usuario@email.com",
-//                Likables.TOPIC,
-//                1L
-//
-//        );
-//    }
+    @Test
+    @DisplayName("deveria retornar http:200 quando curtido corretamente")
+    @WithMockUser
+    public void likeTopic_Scene1() throws Exception {
+        TopicRegisterDataDTO validDataDTO = this.setValidData();
+
+        var response = mvc.perform(post(TOPIC_REGISTER_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validDataDTO)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
+
+        System.out.println(response.getContentAsString());
+
+        Topic topic = topicRepository.findById(1L).get();
+        LikeRegisterDataDTO validLikeData = new LikeRegisterDataDTO(
+                topic.getUser().getLogin(),
+                topic.getEntityType(),
+                topic.getId()
+        );
+
+        var updateResponse = mvc.perform(put(TOPIC_LIKE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validLikeData)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        System.out.println(userRepository.findById(1L).get().getLikeList().size());
+    }
 
 
-    private TopicUpdateDataDTO setUpdateValidData() {
+    @Test
+    @DisplayName("deveria retornar http:200 quando descurtido corretamente")
+    @WithMockUser
+    public void disLikeTopic_Scene1() throws Exception {
+        TopicRegisterDataDTO validDataDTO = this.setValidData();
+
+        var response = mvc.perform(post(TOPIC_REGISTER_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validDataDTO)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
+
+        System.out.println(response.getContentAsString());
+
+        User user = userRepository.findUserByLogin(validDataDTO.userLogin()).get();
+
+        Topic topic = topicRepository.findById(user.getTopicList().getFirst().getId()).get();
+
+        LikeRegisterDataDTO validLikeData = new LikeRegisterDataDTO(
+                user.getLogin(),
+                topic.getEntityType(),
+                topic.getId()
+        );
+
+        var likeResponse = mvc.perform(put(TOPIC_LIKE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validLikeData)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        System.out.println(userRepository.findById(user.getId()).get().getLikeList().size());
+
+        LikeRegisterDataDTO validDislikeData = new LikeRegisterDataDTO(
+                user.getLogin(),
+                Likables.TOPIC,
+                topic.getId()
+        );
+
+        var dislikeResponse = mvc.perform(delete(TOPIC_DISLIKE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validDislikeData)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        user = userRepository.findUserByLogin(user.getLogin()).get();
+
+        System.out.println(userRepository.findById(user.getId()).get().getLikeList().size());
+        assertThat(user.getLikeList()).isEmpty();
+
+    }
+
+    private TopicUpdateDataDTO setUpdateValidData(Long userId) {
         return new TopicUpdateDataDTO(
-                1L,
+                userId,
                 "titulo-2",
                 "descricao",
                 "teste-1"
@@ -185,6 +246,7 @@ class TopicControllerTest {
                 "teste"
         );
     }
+
     private TopicRegisterDataDTO setValidData() {
         User user = new User("usuario@email.com", "123456");
         user = userRepository.save(user);
@@ -194,7 +256,7 @@ class TopicControllerTest {
                 "descricao",
                 user.getLogin(),
                 "teste"
-                );
+        );
     }
 
 }

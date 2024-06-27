@@ -1,6 +1,7 @@
 package br.com.alura.Forum_Hub.domain.model.topic;
 
 import br.com.alura.Forum_Hub.domain.model.like.Likables;
+import br.com.alura.Forum_Hub.domain.model.like.Like;
 import br.com.alura.Forum_Hub.domain.model.post.Post;
 import br.com.alura.Forum_Hub.domain.model.user.User;
 import jakarta.persistence.*;
@@ -36,7 +37,7 @@ public class Topic {
     @OneToMany(/*fetch = FetchType.EAGER,*/ cascade = CascadeType.ALL, mappedBy = "topicOfPost")
     List<Post> postList = new ArrayList<>();
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Likables entityType = Likables.TOPIC;
 
     public Topic(String title, String message, String course, User user) {

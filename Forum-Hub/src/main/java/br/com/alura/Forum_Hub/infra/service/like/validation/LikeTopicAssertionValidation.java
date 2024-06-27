@@ -7,7 +7,7 @@ import br.com.alura.Forum_Hub.infra.service.like.validation.interfaces.ValidateT
 import org.springframework.stereotype.Component;
 
 @Component
-public class TopicAssertionValidation implements ValidateTopicLikeing {
+public class LikeTopicAssertionValidation implements ValidateTopicLikeing {
     @Override
     public void validate(LikeRegisterDataDTO dataDTO) {
         if(!dataDTO.likedItem().equals(Likables.TOPIC)){

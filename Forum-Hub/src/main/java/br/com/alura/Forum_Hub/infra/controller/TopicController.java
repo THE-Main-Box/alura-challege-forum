@@ -1,16 +1,15 @@
 package br.com.alura.Forum_Hub.infra.controller;
 
+import br.com.alura.Forum_Hub.domain.dto.like.LikeDetailedDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.like.LikeRegisterDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicDetailedDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicListDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicRegisterDataDTO;
 import br.com.alura.Forum_Hub.domain.dto.topic.TopicUpdateDataDTO;
 import br.com.alura.Forum_Hub.domain.model.topic.Topic;
-import br.com.alura.Forum_Hub.infra.service.like.LikeService;
 import br.com.alura.Forum_Hub.infra.service.topic.TopicService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,15 +26,11 @@ public class TopicController {
 
     @Autowired
     private TopicService topicService;
-    @Autowired
-    private LikeService likeService;
 
     @PostMapping("/register")
     @SecurityRequirement(name = "bearer-key")
     public ResponseEntity<Object> registerTopic(@RequestBody @Valid TopicRegisterDataDTO dataDTO, UriComponentsBuilder builder){
-
         Topic topic = topicService.createTopicObject(dataDTO);
-
         URI uri = builder.path("/topic/{id}").buildAndExpand(topic.getId()).toUri();
         return ResponseEntity.created(uri).body(new TopicDetailedDataDTO(topic));
     }
@@ -61,11 +56,6 @@ public class TopicController {
     @GetMapping("/{id}")
     public ResponseEntity<TopicDetailedDataDTO> showDetailedData(@PathVariable Long id){
         return ResponseEntity.ok(topicService.getTopicById(id));
-    }
-
-    @PutMapping("/like")
-    public ResponseEntity<Object> likeTopic(@RequestBody LikeRegisterDataDTO dataDTO){
-        return ResponseEntity.ok().body(likeService.likeTopic(dataDTO));
     }
 
 }

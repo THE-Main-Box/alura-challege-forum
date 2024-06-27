@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = "br.com.alura.Forum_Hub")
 public class ForumHubApplication {
 
-//	documentation: http://localhost:8080/swagger-ui.html
+//	documentation: http://*endereco*:*porta*/swagger-ui.html
 
 	public static void main(String[] args) {
 		SpringApplication.run(ForumHubApplication.class, args);

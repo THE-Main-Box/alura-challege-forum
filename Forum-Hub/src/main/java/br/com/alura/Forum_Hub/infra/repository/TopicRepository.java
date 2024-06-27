@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, Long> {
-    @Query("SELECT t FROM Topic t WHERE t.deleted = false")
-    Page<Topic> findAllPagedDeletedFalse(Pageable pageable);
+    @Query("SELECT t FROM Topic t")
+    Page<Topic> findAllPaged(Pageable pageable);
 }

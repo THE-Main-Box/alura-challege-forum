@@ -28,13 +28,12 @@ public class Post {
     private User user;
     private String userResponse;
     private LocalDateTime creationDateTime;
-    private boolean deleted;
     private boolean likedFromTopicAuthor;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Topic topicOfPost;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Likables entityType = Likables.POST;
 
     public Post(User user, String userResponse, Topic topic) {
@@ -42,7 +41,6 @@ public class Post {
         this.userResponse = userResponse;
         this.creationDateTime = LocalDateTime.now();
         this.topicOfPost = topic;
-        this.deleted = false;
         this.likedFromTopicAuthor = false;
     }
 }
